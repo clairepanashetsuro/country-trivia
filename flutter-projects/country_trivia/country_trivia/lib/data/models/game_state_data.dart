@@ -1,6 +1,13 @@
 import 'question.dart';
 import '../enums/game_state.dart';
 
+/// Sentinel used by [GameStateData.copyWith] to distinguish "argument omitted"
+/// from "explicitly set to null".
+///
+/// Without this, `x ?? this.x` makes it impossible to clear a nullable field:
+/// passing `null` would silently keep the old value.
+const Object _unset = Object();
+
 /// Immutable data class representing the complete game state.
 class GameStateData {
   /// Current game state
@@ -42,28 +49,38 @@ class GameStateData {
     this.lastPointsEarned,
   });
 
-  /// Creates a copy of this state with optionally updated fields
+  /// Creates a copy of this state with optionally updated fields.
+  ///
+  /// Omitted arguments keep their current value. Passing `null` explicitly
+  /// for a nullable field clears it — see [_unset] for why this needs a
+  /// sentinel rather than a plain `??`.
   GameStateData copyWith({
     GameState? state,
-    Question? currentQuestion,
+    Object? currentQuestion = _unset,
     int? score,
     int? attempts,
     int? currentStreak,
     int? totalSolved,
     int? totalCountries,
-    bool? lastAnswerCorrect,
-    int? lastPointsEarned,
+    Object? lastAnswerCorrect = _unset,
+    Object? lastPointsEarned = _unset,
   }) {
     return GameStateData(
       state: state ?? this.state,
-      currentQuestion: currentQuestion ?? this.currentQuestion,
+      currentQuestion: identical(currentQuestion, _unset)
+          ? this.currentQuestion
+          : currentQuestion as Question?,
       score: score ?? this.score,
       attempts: attempts ?? this.attempts,
       currentStreak: currentStreak ?? this.currentStreak,
       totalSolved: totalSolved ?? this.totalSolved,
       totalCountries: totalCountries ?? this.totalCountries,
-      lastAnswerCorrect: lastAnswerCorrect ?? this.lastAnswerCorrect,
-      lastPointsEarned: lastPointsEarned ?? this.lastPointsEarned,
+      lastAnswerCorrect: identical(lastAnswerCorrect, _unset)
+          ? this.lastAnswerCorrect
+          : lastAnswerCorrect as bool?,
+      lastPointsEarned: identical(lastPointsEarned, _unset)
+          ? this.lastPointsEarned
+          : lastPointsEarned as int?,
     );
   }
 

@@ -69,6 +69,40 @@ void main() {
       expect(updated.lastPointsEarned, 10);
     });
 
+    test('copyWith clears nullable fields when passed explicit null', () {
+      const original = GameStateData(
+        state: GameState.answered,
+        currentQuestion: question,
+        lastAnswerCorrect: false,
+        lastPointsEarned: 0,
+      );
+
+      final updated = original.copyWith(
+        lastAnswerCorrect: null,
+        lastPointsEarned: null,
+        currentQuestion: null,
+      );
+
+      expect(updated.lastAnswerCorrect, isNull);
+      expect(updated.lastPointsEarned, isNull);
+      expect(updated.currentQuestion, isNull);
+    });
+
+    test('copyWith keeps nullable fields when the argument is omitted', () {
+      const original = GameStateData(
+        state: GameState.answered,
+        currentQuestion: question,
+        lastAnswerCorrect: true,
+        lastPointsEarned: 10,
+      );
+
+      final updated = original.copyWith(score: 20);
+
+      expect(updated.lastAnswerCorrect, isTrue);
+      expect(updated.lastPointsEarned, 10);
+      expect(updated.currentQuestion, question);
+    });
+
     test('copyWith preserves unspecified fields', () {
       const original = GameStateData(
         state: GameState.ready,
